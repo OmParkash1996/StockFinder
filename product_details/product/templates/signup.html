@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .center-content {
+        text-align: center;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="center-content">
+      <div id="login-form">
+        <h2>Login</h2>
+        <form method="post" action="http://127.0.0.1:8000/api-token-auth/">
+          <!-- {% csrf_token %} -->
+          <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required />
+          </div>
+          <button type="submit" onclick="login()">Login</button>
+          <p>
+            Don't have an account?
+            <a href="javascript:void(0);" onclick="toggleForm('signup-form')"
+              >Sign Up</a
+            >
+          </p>
+        </form>
+      </div>
+      <div id="signup-form" style="display: none">
+        <h2>Signup</h2>
+        <form
+          id="signup-form"
+          method="post"
+          action="http://127.0.0.1:8000/user-signup/"
+        >
+          <div class="form-group">
+            <label for="first_name">First Name:</label>
+            <input type="text" name="first_name" id="first_name" required />
+          </div>
+          <div class="form-group">
+            <label for="last_name">Last Name:</label>
+            <input type="text" name="last_name" id="last_name" required />
+          </div>
+          <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="sign-up-username" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input
+              type="password"
+              name="password"
+              id="sign-up-password"
+              required
+            />
+          </div>
+          <button type="submit" id="signup-button" onclick="signup()">
+            Signup
+          </button>
+          <p>
+            Already have an account?
+            <a href="javascript:void(0);" onclick="toggleForm('login-form')"
+              >Login</a
+            >
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      async function login() {
+        try {
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+          const formData = new FormData();
+          formData.append("username", username);
+          formData.append("password", password);
+          const res = await fetch("http://127.0.0.1:8000/api-token-auth/", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => {
+              if (response.ok) {
+                return response.json(); // Parse the JSON response
+              } else {
+                console.error("Login failed");
+                alert('Login failed');
+              }
+            })
+            .then((data) => {
+              // Check if the response contains a token or other relevant data
+              if (data.token) {
+                // Store the token (if needed)
+                localStorage.setItem("token", data.token);
+
+                // Create a link to the dashboard.html page
+                const dashboardLink = document.createElement("a");
+                dashboardLink.href = "./dashboard.html"; // Replace with your desired URL
+                dashboardLink.style.display = "none"; // Hide the link
+
+                // Append the link to the document body
+                document.body.appendChild(dashboardLink);
+
+                // Programmatically click the link to navigate to the dashboard.html page
+                dashboardLink.click();
+              }
+            })
+            .catch((error) => {
+              console.error("Network error:", error);
+              alert('Login failed');
+            });
+        } catch (err) {
+          console.log(err.message);
+        }
+      }
+
+      function toggleForm(formId) {
+        const loginForm = document.getElementById("login-form");
+        const signupForm = document.getElementById("signup-form");
+        if (formId === "login-form") {
+          loginForm.style.display = "block";
+          signupForm.style.display = "none";
+        } else {
+          loginForm.style.display = "none";
+          signupForm.style.display = "block";
+        }
+      }
+
+      async function signup() {
+        try {
+          const first_name = document.getElementById("first_name").value;
+          const last_name = document.getElementById("last_name").value;
+          const username = document.getElementById("sign-up-username").value;
+          const email = document.getElementById("eamil").value;
+          const password = document.getElementById("sign-up-username").value;
+
+          const formData = new FormData();
+          formData.append("first_name", first_name);
+          formData.append("last_name", last_name);
+          formData.append("username", username);
+          formData.append("email", email);
+          formData.append("password", password);
+
+          const response = await res.json();
+          fetch("http://127.0.0.1:8000/user-signup/", {
+            method: "POST",
+            body: formData,
+          });
+          alert("Congratulations! You have successfully signed up. You can now log in using your credentials.");
+          
+        } catch (err) {
+          console.log(err.message);
+        }
+      }
+    </script>
+  </body>
+</html>

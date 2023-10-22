@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+
+    <!-- Include DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+
+    <style>
+        .dashboard {
+            position: relative;
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <button type="submit" class="logout-button" onclick="confirmLogout()">Logout</button>
+        <h1 id="welcome-message">Welcome, User!</h1>
+        <p>This is a product details dashboard.</p>
+
+        <table id="data-table" class="display">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Available Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here using JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Include jQuery and DataTables JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+
+    <style>
+        /* Add CSS styles to make the table content equally aligned */
+        table.dataTable {
+            width: 100%;
+        }
+        table.dataTable th, table.dataTable td {
+            text-align: center; /* Center-align text in cells */
+            width: 20%; /* Equal width for all columns */
+        }
+    </style>
+
+    <script>
+        // Replace 'apiEndpoint' with the actual API endpoint URL.
+        const apiEndpoint = 'http://127.0.0.1:8000/get-product-details/';
+        const jwtToken = localStorage.getItem('token')
+
+        function confirmLogout() {
+            const confirmation = confirm("Are you sure you want to logout?");
+            if (confirmation) {
+                // If the user confirms, proceed with logout
+                logout();
+            }
+        }
+
+        function logout() {
+            // Clear the local storage and redirect to the login page
+            localStorage.clear();
+            const dashboardLink = document.createElement("a");
+            dashboardLink.href = "./signup.html"; // Replace with your desired URL
+            dashboardLink.style.display = "none"; // Hide the link
+
+            // Append the link to the document body
+            document.body.appendChild(dashboardLink);
+
+            // Programmatically click the link to navigate to the dashboard.html page
+            dashboardLink.click();
+        }
+
+        // Wait for the document to be fully loaded
+        $(document).ready(function () {
+            fetch(apiEndpoint, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `jwt ${jwtToken}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const email = data.data.user_email;
+                const welcomeMessage = document.getElementById("welcome-message");
+                welcomeMessage.textContent = `Welcome, ${email}!`; // Update the welcome message with the user's email
+                const dataTable = $('#data-table').DataTable({
+                    data: data.data.product_details,
+                    columns: [
+                        { data: 'id' },
+                        { data: 'name' },
+                        { data: 'description' },
+                        { data: 'price' },
+                        { data: 'available_stock' }
+                    ],
+                    paging: true, // Enable pagination
+                    lengthChange: false, // Disable the page length change option
+                    pageLength: 10, // Set the number of rows per page
+                    searching: true, // Enable search bar
+                    ordering: true, // Enable sorting
+                    info: true, // Show information
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        });
+    </script>
+</body>
+</html>
