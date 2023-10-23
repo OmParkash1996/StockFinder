@@ -5,15 +5,15 @@ To clone and run a Django app, you'll need the following prerequisites:
     2. Virtual Environment (Optional): It's a good practice to create a virtual environment for your Django project. This isolates your project's dependencies from the system-wide Python installation.
     
 **Step 1:** First you have to clone the repository using given below command:
-            **git clone https://github.com/OmParkash1996/StockFinder.git**
+            git clone https://github.com/OmParkash1996/StockFinder.git
 
 **Step 2:** You can install this project requirments through following command:
 
-            **pip install -r requirements.txt**
+            pip install -r requirements.txt
 
 **Step 3:** After that you have to run the server through following commands:
 
-            **python manage.py runserver**
+            python manage.py runserver
 
 **Step 4:** Go to the "StockFinder/product_details/product/templates" directory and click on the **signup.html** file.
 
